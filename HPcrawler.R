@@ -10,6 +10,7 @@ link <- data.frame()
 title <- data.frame()
 time <- data.frame()
 type <- data.frame()
+postbody <- data.frame()
 
 hp[1] <- httpGET("http://hellopeter.com/momentum/compliments-and-complaints?country=South%20Africa&pg=1")
 
@@ -28,6 +29,8 @@ for (i in 2:pages){
   
 }
 
+
+# Run this
 for (i in 1:pages) {
   linklocations <- gregexpr("<div class=\"td-item2\"><a class=\"fb-link\"", hp[i])
 for (j in 1:length(linklocations[[1]])) {
@@ -37,22 +40,42 @@ snippet <- substring(hp[i],
                      linklocations[[1]][j],
                      if (j == length(linklocations[[1]])) nchar(hp[i]) else linklocations[[1]][j+1])
 
-# Link
-link[j,i] <- substring(snippet, gregexpr("href=\"",snippet)[[1]][1] + 6,gregexpr(" title=\"",snippet)[[1]][1]-2)
+  # Link
+  link[j,i] <- substring(snippet, gregexpr("href=\"",snippet)[[1]][1] + 6,gregexpr(" title=\"",snippet)[[1]][1]-2)
+  
+  # Title
+  a <- gregexpr("title=\"",snippet)[[1]][1] + 7
+  b <- min(gregexpr("\">",snippet)[[1]][which(gregexpr("\">",snippet)[[1]] > gregexpr("title=\"",snippet)[[1]][1] + 7)])-1
+  title[j,i] <- substring(snippet, a, b)
+  
+  # Time of post
+  a <- gregexpr("\">\t",snippet)[[1]][1] + 7
+  b <- min(gregexpr("\t",snippet)[[1]][which(gregexpr("\t",snippet)[[1]] > gregexpr("\">\t",snippet)[[1]][1] + 7)])-1
+  time[j,i] <- as.character(as.Date(trim.leading(substring(snippet, a, b)), format = "%H:%M:%S %A %d %b %y"))
+  
+  # Type of post
+  if (regexpr("complaints/", link[j,i], ignore.case = T) != -1) type[j,i] <- "Complaint" 
+  if (regexpr("complaints-to-compliments/", link[j,i], ignore.case = T) != -1) type[j,i] <- "Convertion"
+  if (regexpr("compliments/", link[j,i], ignore.case = T) != -1) type[j,i] <- "Compliment" 
 
-# Title
-a <- gregexpr("title=\"",snippet)[[1]][1] + 7
-b <- min(gregexpr("\">",snippet)[[1]][which(gregexpr("\">",snippet)[[1]] > gregexpr("title=\"",snippet)[[1]][1] + 7)])-1
-title[j,i] <- substring(snippet, a, b)
-
-# Time of post
-a <- gregexpr("\">\t",snippet)[[1]][1] + 7
-b <- min(gregexpr("\t",snippet)[[1]][which(gregexpr("\t",snippet)[[1]] > gregexpr("\">\t",snippet)[[1]][1] + 7)])-1
-time[j,i] <- as.Date(trim.leading(substring(snippet, a, b)), format = "%H:%M:%S %A %d %b %y")
-
+if (!is.na[link[j,i]]) {
+  body <- httpGET(link[j,i])
+  #kry content
+  #haal \n\t uit
+  #store
+  
+  
+  
 }
 
+
+
+
+  }
 }
 
+link[!is.na(link)]
 
+httpGET("http://hellopeter.com/momentum/compliments/excellent-service-1655775")
+#purple-shade border justify
 
