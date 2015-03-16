@@ -3,6 +3,9 @@ require(XML)
 
 trim.leading <- function (x)  sub("^\\s+", "", x)
 trim.trailing <- function (x) sub("\\s+$", "", x)
+cleanFun <- function(htmlString) {
+  return(gsub("<.*?>", "", htmlString))
+}
 
 
 hp <- c()
@@ -11,6 +14,8 @@ title <- data.frame()
 time <- data.frame()
 type <- data.frame()
 postbody <- data.frame()
+
+txt <- "\\(Supplier name changed from.*\\)"
 
 hp[1] <- httpGET("http://hellopeter.com/momentum/compliments-and-complaints?country=South%20Africa&pg=1")
 
@@ -58,24 +63,33 @@ snippet <- substring(hp[i],
   if (regexpr("complaints-to-compliments/", link[j,i], ignore.case = T) != -1) type[j,i] <- "Convertion"
   if (regexpr("compliments/", link[j,i], ignore.case = T) != -1) type[j,i] <- "Compliment" 
 
-if (!is.na[link[j,i]]) {
-  body <- httpGET(link[j,i])
-  #kry content
-  #haal \n\t uit
-  #store
+  # Downloads post
+  if (!is.na(link[j,i])) {
+    post <- httpGET(link[j,i])
+    a <- gregexpr("shade border justify\">", post)
+    b <- gregexpr("<div class=\"report-action\">", post)
+    postbody[j,i] <- cleanFun(substring(post, a[[1]][1] + attr(a[[1]], "match.length"), b[[1]][1]-1))
+  }
+    
+    #remove name changes strings
+    
+    if (gregexpr(txt, postbody[j,i]) != -1) {
+      to.remove <- substring(m,
+                             gregexpr(txt,m)[[1]][1],
+                             gregexpr(txt,m)[[1]][1] + attr(gregexpr(txt,m)[[1]], "match.length") -1)
+      postbody[j,i] <- gsub(to.remove, "", postbody[j,i])
+    }
+      
+      
+     
+    
+    
+    
   
-  
-  
-}
-
-
-
 
   }
 }
 
-link[!is.na(link)]
 
-httpGET("http://hellopeter.com/momentum/compliments/excellent-service-1655775")
-#purple-shade border justify
+
 
