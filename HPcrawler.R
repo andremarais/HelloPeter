@@ -1,5 +1,6 @@
 require(RCurl)
 require(XML)
+require(wordcloud)
 
 trim.leading <- function (x)  sub("^\\s+", "", x)
 trim.trailing <- function (x) sub("\\s+$", "", x)
@@ -17,7 +18,7 @@ postbody <- data.frame()
 
 txt <- "\\(Supplier name changed from.*\\)"
 
-hp[1] <- httpGET("http://hellopeter.com/momentum/compliments-and-complaints?country=South%20Africa&pg=1")
+hp[1] <- httpGET("http://hellopeter.com/discovery-health/compliments-and-complaints?country=South%20Africa&pg=1")
 
 
 
@@ -29,8 +30,8 @@ pages <- as.numeric(substring(lpsnippet, a, b))
 
 
 for (i in 2:pages){
-  hp[i] <- httpGET(paste("http://hellopeter.com/momentum/compliments-and-complaints?country=South%20Africa&pg=", i, sep = ""))
-
+  hp[i] <- httpGET(paste("http://hellopeter.com/discovery-health/compliments-and-complaints?country=South%20Africa&pg=", i, sep = ""))
+print(i)
   
 }
 
@@ -74,22 +75,15 @@ snippet <- substring(hp[i],
     #remove name changes strings
     
     if (gregexpr(txt, postbody[j,i]) != -1) {
-      to.remove <- substring(m,
-                             gregexpr(txt,m)[[1]][1],
-                             gregexpr(txt,m)[[1]][1] + attr(gregexpr(txt,m)[[1]], "match.length") -1)
+      to.remove <- substring(postbody[j,i],
+                             gregexpr(txt,postbody[j,i])[[1]][1],
+                             gregexpr(txt,postbody[j,i])[[1]][1] + attr(gregexpr(txt,postbody[j,i])[[1]], "match.length") -1)
       postbody[j,i] <- gsub(to.remove, "", postbody[j,i])
+      postbody[j,i] <- gsub("\t", "",gsub("\n", "", postbody[j,i]))
     }
       
-      
-     
-    
-    
-    
-  
-
+  print(c(i,j))
   }
 }
 
-
-
-
+saveRDS(postbody, "MiWay.rds")
