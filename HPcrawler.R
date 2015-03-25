@@ -18,7 +18,7 @@ postbody <- data.frame()
 
 txt <- "\\(Supplier name changed from.*\\)"
 
-hp[1] <- httpGET("http://hellopeter.com/discovery-health/compliments-and-complaints?country=South%20Africa&pg=1")
+hp[1] <- httpGET("http://hellopeter.com/momentum/compliments-and-complaints?country=South%20Africa&pg=1")
 
 
 
@@ -30,7 +30,7 @@ pages <- as.numeric(substring(lpsnippet, a, b))
 
 
 for (i in 2:pages){
-  hp[i] <- httpGET(paste("http://hellopeter.com/discovery-health/compliments-and-complaints?country=South%20Africa&pg=", i, sep = ""))
+  hp[i] <- httpGET(paste("http://hellopeter.com/momentum/compliments-and-complaints?country=South%20Africa&pg=", i, sep = ""))
 print(i)
   
 }
@@ -85,5 +85,7 @@ snippet <- substring(hp[i],
   print(c(i,j))
   }
 }
+
+Momentum <- list(time, type, postbody)
 setwd("C:/Users/Veldrin/Documents/GitHub/HelloPeter")
-saveRDS(postbody, "Discovery.rds")
+saveRDS(Momentum, "Momentum.rds")
