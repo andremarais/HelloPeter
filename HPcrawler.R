@@ -15,6 +15,7 @@ title <- data.frame()
 time <- data.frame()
 type <- data.frame()
 postbody <- data.frame()
+response.date <- data.frame()
 
 txt <- "\\(Supplier name changed from.*\\)"
 
@@ -71,7 +72,8 @@ snippet <- substring(hp[i],
   if (!is.na(link[j,i])) {
     post <- httpGET(link[j,i])
     a <- min(gregexpr("SUPPLIER'S RESPONSE", post)[[1]])
-    if (a == -1) break 
+    if (a == -1) { response.date[i,j] <- 0
+      break} 
     b <- min(gregexpr("[0-9]{2}:[0-9]{2}:[0-9]{2}", substring(post, a, a + 500))[[1]])
     c <- min(gregexpr("</td>", substring(post, a + b , a + b + 60))[[1]])
     d <- substring(post, a + b + 10, a +  b + c + 8)
