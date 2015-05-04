@@ -1,6 +1,7 @@
 require(RCurl)
 require(XML)
 require(wordcloud)
+require(plyr)
 
 trim.leading <- function (x)  sub("^\\s+", "", x)
 trim.trailing <- function (x) sub("\\s+$", "", x)
@@ -33,7 +34,7 @@ b <- min(gregexpr("\"",lpsnippet)[[1]][which(gregexpr("\"",lpsnippet)[[1]] > gre
 pages <- as.numeric(substring(lpsnippet, a, b))
 
 
-for (i in 1:2){
+for (i in 1:pages){
   hp[i] <- httpGET(paste("http://hellopeter.com/momentum-health/compliments-and-complaints?country=South%20Africa&pg=", i, sep = ""))
 print(i)
   
@@ -41,7 +42,8 @@ print(i)
 
 
 # Run this
-for (i in 1:2) {
+
+for (i in 1:pages) {
   linklocations <- gregexpr("<div class=\"td-item2\"><a class=\"fb-link\"", hp[i])
 for (j in 1:length(linklocations[[1]])) {
 
@@ -72,29 +74,52 @@ snippet <- substring(hp[i],
   if (!is.na(link[j,i])) {
     post <- httpGET(link[j,i])
     a <- min(gregexpr("SUPPLIER'S RESPONSE", post)[[1]])
-    if (a == -1) { response.date[i,j] <- 0
-      break} 
+    if (a == -1)  response.date[j,i] <- 0 else {
+       
     b <- min(gregexpr("[0-9]{2}:[0-9]{2}:[0-9]{2}", substring(post, a, a + 500))[[1]])
     c <- min(gregexpr("</td>", substring(post, a + b , a + b + 60))[[1]])
     d <- substring(post, a + b + 10, a +  b + c + 8)
     e <- as.Date(as.character(d), format = "%a %d %b %y")
-    response.date[i,j] <- e
+    response.date[j,i] <- as.character(e)}
                 
 
   }
     
-    #remove name changes strings
-    
-    if (gregexpr(txt, postbody[j,i]) != -1) {
-      to.remove <- substring(postbody[j,i],
-                             gregexpr(txt,postbody[j,i])[[1]][1],
-                             gregexpr(txt,postbody[j,i])[[1]][1] + attr(gregexpr(txt,postbody[j,i])[[1]], "match.length") -1)
-      postbody[j,i] <- gsub(to.remove, "", postbody[j,i])
-      postbody[j,i] <- gsub("\t", "",gsub("\n", "", postbody[j,i]))
-    }
+
       
   print(c(i,j))
   }
 }
 
-saveRDS(postbody, "MiWay.rds")
+link <- data.frame()
+title <- data.frame()
+time <- data.frame()
+type <- data.frame()
+postbody <- data.frame()
+response.date <- data.frame()
+
+
+time.vector <- as.vector(as.matrix(time))
+type.vector <- as.vector(as.matrix(type))
+response.date.vector <- as.vector(as.matrix(response.date))
+
+hp.df <- data.frame(cbind(time.vector, type.vector, response.date.vector))
+colnames(hp.df) <- c("post.date", "type", "response.date")
+hp.df <- hp.df[!is.na(hp.df$post.date),]
+
+hp.df$response.date <- as.Date(hp.df$response.date)
+hp.df$post.date <- as.Date(hp.df$post.date)
+hp.df$response.time <- hp.df$response.date - hp.df$post.date
+hp.df$post.date.month <- format(hp.df$post.date, format = "%Y-%m")
+ave.time.pm <- aggregate(data = hp.df, response.time ~ post.date.month, FUN = mean)
+
+hp.monthly <- count(hp.df, c('post.date.month','type'))
+hp.count <- count(hp.df, c('post.date', 'type'))
+
+ggplot()+ 
+  geom_bar(data = hp.monthly, aes(x = post.date.month, y = freq, fill = type), stat = "identity", position = "dodge")+ 
+  scale_fill_brewer(palette = "Set1")
+#
+ggplot() + 
+  geom_bar(data = ave.time.pm, aes(x = post.date.month, y = as.numeric(response.time), fill = as.numeric(response.time)), stat = "identity")
+
