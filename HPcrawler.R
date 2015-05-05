@@ -17,25 +17,61 @@ time <- data.frame()
 type <- data.frame()
 postbody <- data.frame()
 response.date <- data.frame()
+all.data <- list()
 
-txt <- "\\(Supplier name changed from.*\\)"
+# Momentum
+MomHealth <- "http://hellopeter.com/momentum-health/compliments-and-complaints?country=South%20Africa&pg="
+Momentum <- "http://hellopeter.com/momentum/compliments-and-complaints?country=South%20Africa&pg="
+MSTI <- "http://hellopeter.com/momentum-short-term-insurance/compliments-and-complaints?country=South%20Africa&pg="
 
-hp[1] <- httpGET("http://hellopeter.com/momentum-health/compliments-and-complaints?country=South%20Africa&pg=1")
+# Discovery
+DiscHealth <- "http://hellopeter.com/discovery-health/compliments-and-complaints?country=South%20Africa&pg="
+DiscLife <- "http://hellopeter.com/discovery-life/compliments-and-complaints?country=South%20Africa&pg="
+DiscInsure <- "http://hellopeter.com/discovery-insure/compliments-and-complaints?country=South%20Africa&pg="
 
-momentum[1] <- httpGET("http://hellopeter.com/momentum/compliments-and-complaints?country=South%20Africa&pg=1")
+# Old Mutual
+OM <- "http://hellopeter.com/old-mutual/compliments-and-complaints?country=South%20Africa&pg="
+  
+#Liberty
+LibertyLife <- "http://hellopeter.com/liberty-life/compliments-and-complaints?country=South%20Africa&pg="
 
-MSTI[1] <- httpGET("http://hellopeter.com/momentum-short-term-insurance/compliments-and-complaints?country=South%20Africa&pg=")
+# Metropolitan
+Metro <- "http://hellopeter.com/metropolitan-life/compliments-and-complaints?country=South%20Africa&pg="
+
+#Outsurance
+Outsurance <- "http://hellopeter.com/outsurance/compliments-and-complaints?country=South%20Africa&pg="
+
+#MiWay
+Miway <- "http://hellopeter.com/miway/compliments-and-complaints?country=South%20Africa&pg="
+
+
+insurars <- c(MomHealth, Momentum, MSTI,
+              DiscHealth, DiscLife, DiscInsure,
+              OM,
+              LibertyLife,
+              Metro,
+              Outsurance,
+              Miway)
+
+
+for (h in 1:length(insurars)) {
+
+
+hp[1] <- httpGET(paste(insurars[h], 1, sep = ""))
+
 
 
 #gets last page
 lpsnippet <- substring(hp[1], gregexpr(">>", hp[1])[[1]][1], gregexpr(">>", hp[1])[[1]][2])
+if(is.na(lpsnippet)) pages <- 1 else {
 a <- as.numeric(regexpr("pg=",lpsnippet)[[1]] + attr(gregexpr("pg=",lpsnippet)[[1]], "match.length"))
 b <- min(gregexpr("\"",lpsnippet)[[1]][which(gregexpr("\"",lpsnippet)[[1]] > gregexpr("pg=",lpsnippet)[[1]][1])]) -1
 pages <- as.numeric(substring(lpsnippet, a, b))
+}
 
 
 for (i in 1:pages){
-  hp[i] <- httpGET(paste("http://hellopeter.com/momentum-health/compliments-and-complaints?country=South%20Africa&pg=", i, sep = ""))
+  hp[i] <- httpGET(paste(insurars[h], i, sep = ""))
 print(i)
   
 }
@@ -80,24 +116,18 @@ snippet <- substring(hp[i],
     c <- min(gregexpr("</td>", substring(post, a + b , a + b + 60))[[1]])
     d <- substring(post, a + b + 10, a +  b + c + 8)
     e <- as.Date(as.character(d), format = "%a %d %b %y")
-    response.date[j,i] <- as.character(e)}
-                
-
+    response.date[j,i] <- as.character(e)}             
   }
-    
 
-      
+#Nature
+
   print(c(i,j))
   }
 }
 
-link <- data.frame()
-title <- data.frame()
-time <- data.frame()
-type <- data.frame()
-postbody <- data.frame()
-response.date <- data.frame()
 
+
+}
 
 time.vector <- as.vector(as.matrix(time))
 type.vector <- as.vector(as.matrix(type))
@@ -107,6 +137,12 @@ hp.df <- data.frame(cbind(time.vector, type.vector, response.date.vector))
 colnames(hp.df) <- c("post.date", "type", "response.date")
 hp.df <- hp.df[!is.na(hp.df$post.date),]
 
+
+
+
+
+
+
 hp.df$response.date <- as.Date(hp.df$response.date)
 hp.df$post.date <- as.Date(hp.df$post.date)
 hp.df$response.time <- hp.df$response.date - hp.df$post.date
@@ -115,6 +151,7 @@ ave.time.pm <- aggregate(data = hp.df, response.time ~ post.date.month, FUN = me
 
 hp.monthly <- count(hp.df, c('post.date.month','type'))
 hp.count <- count(hp.df, c('post.date', 'type'))
+ave.time.pm <- aggregate(data = hp.df, response.time ~ post.date.month, FUN = mean)
 
 ggplot()+ 
   geom_bar(data = hp.monthly, aes(x = post.date.month, y = freq, fill = type), stat = "identity", position = "dodge")+ 
