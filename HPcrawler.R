@@ -54,6 +54,8 @@ insurars <- c(MomHealth, Momentum, MSTI,
               Metro,
               Outsurance,
               Miway)
+
+## BEGIN HIERSO POES!!!
 system.time(
 
 for (h in 1:length(insurars)) {
@@ -122,8 +124,8 @@ snippet <- substring(hp[i],
     
     #Nature of post
     if (type[j,i] == "Compliment" ) look.for <- "NATURE"  else look.for <- "PROBLEM"
-    a <- min(gregexpr(look.for, post[j,i], ignore.case = F)[[1]]) + attr(gregexpr(look.for, post[j,i], ignore.case = F)[[1]], "match.length")
-    b <- min(gregexpr("tbl-txt-hd-nb\"", substring(post[j,i], a, a + 200))[[1]]) + attr(gregexpr("tbl-txt-hd-nb\"", substring(post[j,i], a, a + 200))[[1]], "match.length")
+    a <- min(gregexpr(look.for, post[j,i], ignore.case = F)[[1]]) + attr(gregexpr(look.for, post[j,i], ignore.case = F)[[1]], "match.length")[1]
+    b <- min(gregexpr("tbl-txt-hd-nb\"", substring(post[j,i], a, a + 200))[[1]]) + attr(gregexpr("tbl-txt-hd-nb\"", substring(post[j,i], a, a + 200))[[1]], "match.length")[1]
     c <- min(gregexpr("</h3>", substring(post[j,i], a + b, a + b + 200))[[1]]) 
     nature[j,i] <- substring(post[j,i], a + b, a+b+c -2)
     
@@ -139,7 +141,7 @@ snippet <- substring(hp[i],
 
 
 
-  print(c(i,j))
+  print(c(h,i,j))
   }
 }
 
@@ -152,7 +154,7 @@ hp.df <- data.frame(cbind(time.vector, type.vector, response.date.vector, nature
 colnames(hp.df) <- c("post.date", "type", "response.date", "nature")
 hp.df <- hp.df[!is.na(hp.df$post.date),]
 
-all.date[[h]] <- hp.df
+all.data[[h]] <- hp.df
 
 
 }
@@ -163,7 +165,8 @@ all.date[[h]] <- hp.df
 
 
 
-
+### End of moerse download
+saveRDS(all.data, "hp.RDS")
 
 hp.df$response.date <- as.Date(hp.df$response.date)
 hp.df$post.date <- as.Date(hp.df$post.date)
