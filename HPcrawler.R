@@ -2,6 +2,7 @@ require(RCurl)
 require(XML)
 require(wordcloud)
 require(plyr)
+require(ggplot2)
 
 trim.leading <- function (x)  sub("^\\s+", "", x)
 trim.trailing <- function (x) sub("\\s+$", "", x)
@@ -47,6 +48,8 @@ Outsurance <- "http://hellopeter.com/outsurance/compliments-and-complaints?count
 Miway <- "http://hellopeter.com/miway/compliments-and-complaints?country=South%20Africa&pg="
 
 
+
+
 insurars <- c(MomHealth, Momentum, MSTI,
               DiscHealth, DiscLife, DiscInsure,
               OM,
@@ -54,6 +57,15 @@ insurars <- c(MomHealth, Momentum, MSTI,
               Metro,
               Outsurance,
               Miway)
+
+insurar.names <- c("Momentum Health", "Momentum", "Momentum Short Term",
+                   "Discovery Health", "Discovery Life", "Discovery Insure",
+                   "Old Mutual",
+                   "Liberty",
+                   "Metropolitan",
+                   "OutSurance",
+                   "MiWay")
+
 
 ## BEGIN HIERSO POES!!!
 system.time(
@@ -155,33 +167,55 @@ colnames(hp.df) <- c("post.date", "type", "response.date", "nature")
 hp.df <- hp.df[!is.na(hp.df$post.date),]
 
 all.data[[h]] <- hp.df
-
+saveRDS(hp.df, file = paste(insurar.names[h],".RDS", sep = "")
 
 }
 
 )
 
 
+setwd("C:/Users/anmarais/Desktop/GitHub/HelloPeter")
+
+hp.dflist <- list(readRDS("hp.RDS"))
+
+# MomHealth, Momentum, MSTI,
+#               DiscHealth, DiscLife, DiscInsure,
+#               OM,
+#               LibertyLife,
+#               Metro,
+#               Outsurance,
+#               Miway
+
+ins <- 7
+
+hp.df <- data.frame(hp.dflist[[1]][ins])
 
 
-
-### End of moerse download
-saveRDS(all.data, "hp.RDS")
 
 hp.df$response.date <- as.Date(hp.df$response.date)
 hp.df$post.date <- as.Date(hp.df$post.date)
+hp.df <- hp.df[which(hp.df$post.date < paste(substring(as.character(Sys.Date()), 1, 7), "01", sep = "-" )),]
 hp.df$response.time <- hp.df$response.date - hp.df$post.date
-hp.df$post.date.month <- format(hp.df$post.date, format = "%Y-%m")
-ave.time.pm <- aggregate(data = hp.df, response.time ~ post.date.month, FUN = mean)
+hp.df$post.date.month <- paste(substring(as.character(hp.df$post.date), 1, 7), "01", sep = "-" )
+
 
 hp.monthly <- count(hp.df, c('post.date.month','type'))
 hp.count <- count(hp.df, c('post.date', 'type'))
 ave.time.pm <- aggregate(data = hp.df, response.time ~ post.date.month, FUN = mean)
+nature.count <- count(hp.df, c('post.date.month', 'nature'))
+
 
 ggplot()+ 
   geom_bar(data = hp.monthly, aes(x = post.date.month, y = freq, fill = type), stat = "identity", position = "dodge")+ 
-  scale_fill_brewer(palette = "Set1")
-#
+  scale_fill_brewer(palette = "Set1")+
+  theme(axis.text.x = element_text(angle = 45))+
+  ggtitle(paste(insurar.names[ins], "compliments, complaints and conversions"))+
+  xlab("Date") +
+  ylab("Frequency")
+
 ggplot() + 
-  geom_bar(data = ave.time.pm, aes(x = post.date.month, y = as.numeric(response.time), fill = as.numeric(response.time)), stat = "identity")
+  geom_bar(data = ave.time.pm, aes(x = post.date.month, y = as.numeric(response.time), fill = as.numeric(response.time)), stat = "identity")+
+  ggtitle(paste(insurar.names[ins], "response time"))+
+  xlab("Date") +
+  ylab("Average number of days")
 
