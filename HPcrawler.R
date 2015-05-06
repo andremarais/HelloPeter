@@ -15,9 +15,11 @@ link <- data.frame()
 title <- data.frame()
 time <- data.frame()
 type <- data.frame()
+post <- data.frame()
 postbody <- data.frame()
 response.date <- data.frame()
 all.data <- list()
+nature <- data.frame()
 
 # Momentum
 MomHealth <- "http://hellopeter.com/momentum-health/compliments-and-complaints?country=South%20Africa&pg="
@@ -52,7 +54,7 @@ insurars <- c(MomHealth, Momentum, MSTI,
               Metro,
               Outsurance,
               Miway)
-
+system.time(
 
 for (h in 1:length(insurars)) {
 
@@ -103,39 +105,59 @@ snippet <- substring(hp[i],
   
   # Type of post
   if (regexpr("complaints/", link[j,i], ignore.case = T) != -1) type[j,i] <- "Complaint" 
-  if (regexpr("complaints-to-compliments/", link[j,i], ignore.case = T) != -1) type[j,i] <- "Convertion"
   if (regexpr("compliments/", link[j,i], ignore.case = T) != -1) type[j,i] <- "Compliment" 
+  if (regexpr("complaints-to-compliments/", link[j,i], ignore.case = T) != -1) type[j,i] <- "Conversion"
 
   # Response time
   if (!is.na(link[j,i])) {
-    post <- httpGET(link[j,i])
-    a <- min(gregexpr("SUPPLIER'S RESPONSE", post)[[1]])
+    post[j,i] <- httpGET(link[j,i])
+    a <- min(gregexpr("SUPPLIER'S RESPONSE", post[j,i])[[1]])
     if (a == -1)  response.date[j,i] <- 0 else {
        
-    b <- min(gregexpr("[0-9]{2}:[0-9]{2}:[0-9]{2}", substring(post, a, a + 500))[[1]])
-    c <- min(gregexpr("</td>", substring(post, a + b , a + b + 60))[[1]])
-    d <- substring(post, a + b + 10, a +  b + c + 8)
+    b <- min(gregexpr("[0-9]{2}:[0-9]{2}:[0-9]{2}", substring(post[j,i], a, a + 500))[[1]])
+    c <- min(gregexpr("</td>", substring(post[j,i], a + b , a + b + 60))[[1]])
+    d <- substring(post[j,i], a + b + 10, a +  b + c + 8)
     e <- as.Date(as.character(d), format = "%a %d %b %y")
-    response.date[j,i] <- as.character(e)}             
+    response.date[j,i] <- as.character(e)
+    
+    #Nature of post
+    if (type[j,i] == "Compliment" ) look.for <- "NATURE"  else look.for <- "PROBLEM"
+    a <- min(gregexpr(look.for, post[j,i], ignore.case = F)[[1]]) + attr(gregexpr(look.for, post[j,i], ignore.case = F)[[1]], "match.length")
+    b <- min(gregexpr("tbl-txt-hd-nb\"", substring(post[j,i], a, a + 200))[[1]]) + attr(gregexpr("tbl-txt-hd-nb\"", substring(post[j,i], a, a + 200))[[1]], "match.length")
+    c <- min(gregexpr("</h3>", substring(post[j,i], a + b, a + b + 200))[[1]]) 
+    nature[j,i] <- substring(post[j,i], a + b, a+b+c -2)
+    
+    
+    
+    
+    
+    
+    }             
   }
 
-#Nature
+
+
+
 
   print(c(i,j))
   }
 }
 
+time.vector <- as.vector(as.matrix(time))
+type.vector <- as.vector(as.matrix(type))
+response.date.vector <- as.vector(as.matrix(response.date))
+nature.vector <- as.vector(as.matrix(nature))
+
+hp.df <- data.frame(cbind(time.vector, type.vector, response.date.vector, nature.vector))
+colnames(hp.df) <- c("post.date", "type", "response.date", "nature")
+hp.df <- hp.df[!is.na(hp.df$post.date),]
+
+all.date[[h]] <- hp.df
 
 
 }
 
-time.vector <- as.vector(as.matrix(time))
-type.vector <- as.vector(as.matrix(type))
-response.date.vector <- as.vector(as.matrix(response.date))
-
-hp.df <- data.frame(cbind(time.vector, type.vector, response.date.vector))
-colnames(hp.df) <- c("post.date", "type", "response.date")
-hp.df <- hp.df[!is.na(hp.df$post.date),]
+)
 
 
 
