@@ -4,12 +4,6 @@
 require(plyr)
 require(ggplot2)
 
-setwd("C:/Users/anmarais/Desktop/GitHub/HelloPeter/shiny")
-
-hp.stats <- readRDS(file.path(getwd(),"data/hp.RDS"))
-
-
-
 shinyUI(fluidPage(
   titlePanel("Hello Peter stats"),
   sidebarLayout(
@@ -20,21 +14,25 @@ shinyUI(fluidPage(
                                          "MSTI" = "MSTI",
                                          "Discovery Health" = "DiscHealth",
                                          "Discovery Life" = "DiscLife",
-                                         "Discovery Insure", "DiscInsure",
+                                         "Discovery Insure" = "DiscInsure",
                                          "Liberty" = "Liberty",
-                                         "Metropolitan" = "Metropolitan"),
-                                         #still need to add Outsurance and MiWay's data
+                                         "Metropolitan" = "Metropolitan",
+                                         "OutSurance " = "Outsurance",
+                                         "MiWay" = "MiWay"),
                              selected = "Mom"),
                  dateInput("daterange",
                            label = "From:",
-                           value = min(as.Date(hp.stats[[1]]$post.date)),
-                           min = min(as.Date(hp.stats[[1]]$post.date)),
+                           value = "2014-05-01",
+                           min = "2014-05-01",
                            format = "yyyy-mm-dd",
                            startview = "month"
                            )
                  
       
       ),
-    mainPanel(plotOutput("Plot")))
+    mainPanel(plotOutput("Plot"),
+              fluidRow(downloadButton("TurnaroundtimePLot", label = "Download Graph"),
+                       downloadButton("TurnaroundtimeData", label = "Download Data")
+                       ))
   
-))
+)))

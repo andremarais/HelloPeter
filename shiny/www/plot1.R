@@ -1,39 +1,52 @@
-complaints <- function(df1, from) {
+complaints <- function(insurar, from) {
   
-  # from <- 
-  df1 <- hp.stats
+  if (insurar == "Mom") {
+    hp.df <- Mom; p.name <- "Momentum"
+  } else if (insurar == "MomHealth") {
+    hp.df <- MomHealth; p.name <- "Momentum Health"
+  } else if (insurar == "MSTI") {
+    hp.df <- MSTI; p.name <- "Momentum Short Term"
+  } else if (insurar == "DiscHealth") {
+    hp.df <- DiscHealth; p.name <- "Discovery Health"
+  } else if (insurar == "DiscLife") {
+    hp.df <- DiscLife; p.name <- "Discovery Life"
+  } else if (insurar == "DiscInsure") {
+    hp.df <- DiscInsure; p.name <- "Discovery Insure"
+  } else if (insurar == "Liberty") {
+    hp.df <- Liberty; p.name <- "Liberty"
+  } else if (insurar == "Metropolitan") {
+    hp.df <- Metropolitan; p.name <- "Metropolitan"
+  } else if (insurar == "Outsurance") {
+    hp.df <- OutSurance; p.name <- "Outsurance"
+  } else if (insurar == "MiWay") {
+    hp.df <- MiWay; p.name <- "MiWay"
+  }
   
-  hp.df <- data.frame(df1)
-  hp.df$response.date <- as.Date(hp.df$response.date)
-  hp.df$post.date <- as.Date(hp.df$post.date)
+  
+
+
+  hp.df$response.date <- as.Date(hp.df$response.date, format = "%Y-%m-%d")
+  hp.df$post.date <- as.Date(hp.df$post.date, format = "%Y-%m-%d")
   hp.df <- hp.df[which(hp.df$post.date < paste(substring(as.character(Sys.Date()), 1, 7), "01", sep = "-" ) &
                          hp.df$post.date > from),]
   hp.df$response.time <- hp.df$response.date - hp.df$post.date
   hp.df$post.date.month <- as.Date(paste(substring(as.character(hp.df$post.date), 1, 7), "01", sep = "-" ))
   
-  #hp.monthly <- data.frame(count(hp.df, c('post.date.month','type')))
-#   
-#   
-#   
-#   hp.count <- count(hp.df, c('post.date', 'type'))
-#   ave.time.pm <- aggregate(data = hp.df, response.time ~ post.date.month, FUN = mean)
-#   nature.count <- count(hp.df, c('post.date.month', 'nature'))
-#   
-#   
-#   
-  hp.monthly <- aggregate(data = hp.df,  rownames(hp.df) ~ type + post.date.month, FUN = length)
-  colnames(hp.monthly) <- c("type", "post.date.month", "freq")
   
   
-  p <- ggplot(data = hp.monthly, aes(x = post.date.month, y = freq, fill = type))+ 
-  geom_bar(stat = "identity", position = "dodge")
-   # geom_bar(data = hp.monthly, aes(x = post.date.month, y = freq, fill = type), stat = "identity", position = "dodge")
-#     scale_fill_brewer(palette = "Set1")+
-#     theme(axis.text.x = element_text(angle = 45))+
-#     #ggtitle(paste(insurar.names[1], "compliments, complaints and conversions"))+
-#     xlab("Date") +
-#     ylab("Frequency")
+  ave.time.pm <- data.frame(aggregate(data = hp.df, response.time ~ post.date.month, FUN = mean))
+  ave.time.pm$response.time <- as.numeric(ave.time.pm$response.time)
+  ave.time.pm$post.date.month <- as.Date(ave.time.pm$post.date.month )
   
-  return(p)
+  p <- ggplot(data = ave.time.pm, aes(x = post.date.month, y = response.time, fill = response.time)) + 
+    geom_bar(stat = "identity", position = position_dodge(width = 0.9)) +
+    ggtitle(paste(p.name, "turaround time")) +
+    xlab("Date") +
+    ylab("Average number of days")
+    
+  download.data <<- hp.df
+  download.plot <<- p
+  
+  return(list(p, hp.df))
   
 }
