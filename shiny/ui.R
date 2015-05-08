@@ -8,7 +8,7 @@ shinyUI(fluidPage(
   titlePanel("Hello Peter stats"),
   sidebarLayout(
     sidebarPanel(selectInput("Insurer",
-                             label = "Insurar",
+                             label = "Insurer",
                              choices = c("Momentum" = "Mom",
                                          "Momentum Health" = "MomHealth",
                                          "MSTI" = "MSTI",
@@ -22,17 +22,38 @@ shinyUI(fluidPage(
                              selected = "Mom"),
                  dateInput("daterange",
                            label = "From:",
-                           value = "2014-05-01",
-                           min = "2014-05-01",
+                           value = "2014-05-02",
+                           min = "2014-05-02",
                            format = "yyyy-mm-dd",
                            startview = "month"
-                           )
+                           ),
+                 wellPanel(plotOutput("Nature"),
+                           dateInput("daterangeN",
+                                     label = "Select Month",
+                                     value = "2014-05-02",
+                                     min = "2014-05-02",
+                                     format = "yyyy-mm-dd",
+                                     startview = "month"
+
+                             ))
                  
       
       ),
-    mainPanel(plotOutput("Plot"),
-              fluidRow(downloadButton("TurnaroundtimePLot", label = "Download Graph"),
-                       downloadButton("TurnaroundtimeData", label = "Download Data")
-                       ))
+    mainPanel(
+      #Response time plot & buttons 
+      plotOutput("PlotTime"),
+      fluidRow(downloadButton("TurnaroundtimePlot", label = "Download Graph"),
+               downloadButton("TurnaroundtimeData", label = "Download Data")),
+      
+      # Posts plot & buttons
+      plotOutput("PlotPost"),
+      fluidRow(downloadButton("PostsPlot", label = "Download Graph"),
+               downloadButton("PostsData", label = "Download Data"))
+      
+                       
+      
+      
+      
+      )
   
 )))

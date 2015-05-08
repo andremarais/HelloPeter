@@ -1,4 +1,4 @@
-complaints <- function(insurar, from) {
+posts <- function(insurar, from) {
   
   if (insurar == "Mom") {
     hp.df <- Mom; p.name <- "Momentum"
@@ -22,7 +22,7 @@ complaints <- function(insurar, from) {
     hp.df <- MiWay; p.name <- "MiWay"
   }
   
-
+  
   hp.df$response.date <- as.Date(hp.df$response.date, format = "%Y-%m-%d")
   hp.df$post.date <- as.Date(hp.df$post.date, format = "%Y-%m-%d")
   hp.df <- hp.df[which(hp.df$post.date < paste(substring(as.character(Sys.Date()), 1, 7), "01", sep = "-" ) &
@@ -31,20 +31,20 @@ complaints <- function(insurar, from) {
   hp.df$post.date.month <- as.Date(paste(substring(as.character(hp.df$post.date), 1, 7), "01", sep = "-" ))
   
   
+  hp.monthly <- count(hp.df, c('post.date.month','type'))
+
   
-  ave.time.pm <- data.frame(aggregate(data = hp.df, response.time ~ post.date.month, FUN = mean))
-  ave.time.pm$response.time <- as.numeric(ave.time.pm$response.time)
-  ave.time.pm$post.date.month <- as.Date(ave.time.pm$post.date.month )
-  
-  time.plot <- ggplot(data = ave.time.pm, aes(x = post.date.month, y = response.time, fill = response.time)) + 
-    geom_bar(stat = "identity", position = position_dodge(width = 0.9)) +
-    ggtitle(paste(p.name, "turaround time")) +
+  post.plot <- ggplot()+ 
+    geom_bar(data = hp.monthly, aes(x = post.date.month, y = freq, fill = type), stat = "identity", position = "dodge")+ 
+    scale_fill_brewer(palette = "Set1")+
+    theme(axis.text.x = element_text(angle = 45))+
+    ggtitle(paste(p.name, " compliments, complaints and conversions"))+
     xlab("Date") +
-    ylab("Average number of days")
-    
-  download.time.data <<- ave.time.pm
-  download.time.plot <<- time.plot
+    ylab("Frequency")
   
-  return(time.plot)
+  download.post.data <<- hp.monthly
+  download.post.plot <<- post.plot
+  
+  return(post.plot)
   
 }

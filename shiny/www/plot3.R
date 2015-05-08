@@ -1,4 +1,4 @@
-complaints <- function(insurar, from) {
+nature <- function(insurar, plot.month) {
   
   if (insurar == "Mom") {
     hp.df <- Mom; p.name <- "Momentum"
@@ -22,29 +22,37 @@ complaints <- function(insurar, from) {
     hp.df <- MiWay; p.name <- "MiWay"
   }
   
-
+  
   hp.df$response.date <- as.Date(hp.df$response.date, format = "%Y-%m-%d")
   hp.df$post.date <- as.Date(hp.df$post.date, format = "%Y-%m-%d")
-  hp.df <- hp.df[which(hp.df$post.date < paste(substring(as.character(Sys.Date()), 1, 7), "01", sep = "-" ) &
-                         hp.df$post.date > from),]
   hp.df$response.time <- hp.df$response.date - hp.df$post.date
   hp.df$post.date.month <- as.Date(paste(substring(as.character(hp.df$post.date), 1, 7), "01", sep = "-" ))
   
   
+
   
-  ave.time.pm <- data.frame(aggregate(data = hp.df, response.time ~ post.date.month, FUN = mean))
-  ave.time.pm$response.time <- as.numeric(ave.time.pm$response.time)
-  ave.time.pm$post.date.month <- as.Date(ave.time.pm$post.date.month )
   
-  time.plot <- ggplot(data = ave.time.pm, aes(x = post.date.month, y = response.time, fill = response.time)) + 
-    geom_bar(stat = "identity", position = position_dodge(width = 0.9)) +
-    ggtitle(paste(p.name, "turaround time")) +
-    xlab("Date") +
-    ylab("Average number of days")
-    
-  download.time.data <<- ave.time.pm
-  download.time.plot <<- time.plot
+  nature.pm <- count(hp.df, c('post.date.month',' nature'))
   
-  return(time.plot)
+  to.plot <- nature.pm[which(nature.pm$post.date.month == as.Date(paste(substring(as.character(plot.month), 1, 7), "01", sep = "-" ))),] ###
+  to.plot$nature <- factor(to.plot$nature)
+  plot.order <- order(to.plot$freq, decreasing = T)
+  to.plot <- to.plot[plot.order,]
+  to.plot <- to.plot[1:5,]
+  
+
+  
+
+  nature.plot <- ggplot()+ 
+    geom_bar(data = to.plot, aes(x = reorder(nature, freq), y = freq, fill = freq), stat = "identity", position = "dodge")+ 
+    #theme(axis.text.x = element_text(angle = 45))+ 
+    coord_flip() +
+    #ggtitle(paste(p.name, " compliments, complaints and conversions"))+
+    xlab("Nature of post") +
+    ylab("Frequency")+
+    ggtitle("Top 5 natures of complaints")
+
+  
+  return(nature.plot)
   
 }
