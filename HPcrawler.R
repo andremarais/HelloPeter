@@ -174,48 +174,4 @@ saveRDS(hp.df, file = paste(insurar.names[h],".RDS", sep = "")
 )
 
 
-setwd("C:/Users/anmarais/Desktop/GitHub/HelloPeter")
-
-hp.dflist <- list(readRDS("hp.RDS"))
-
-# MomHealth, Momentum, MSTI,
-#               DiscHealth, DiscLife, DiscInsure,
-#               OM,
-#               LibertyLife,
-#               Metro,
-#               Outsurance,
-#               Miway
-
-ins <- 7
-
-hp.df <- data.frame(hp.dflist[[1]][ins])
-
-
-
-hp.df$response.date <- as.Date(hp.df$response.date)
-hp.df$post.date <- as.Date(hp.df$post.date)
-hp.df <- hp.df[which(hp.df$post.date < paste(substring(as.character(Sys.Date()), 1, 7), "01", sep = "-" )),]
-hp.df$response.time <- hp.df$response.date - hp.df$post.date
-hp.df$post.date.month <- paste(substring(as.character(hp.df$post.date), 1, 7), "01", sep = "-" )
-
-
-hp.monthly <- count(hp.df, c('post.date.month','type'))
-hp.count <- count(hp.df, c('post.date', 'type'))
-ave.time.pm <- aggregate(data = hp.df, response.time ~ post.date.month, FUN = mean)
-nature.count <- count(hp.df, c('post.date.month', 'nature'))
-
-
-ggplot()+ 
-  geom_bar(data = hp.monthly, aes(x = post.date.month, y = freq, fill = type), stat = "identity", position = "dodge")+ 
-  scale_fill_brewer(palette = "Set1")+
-  theme(axis.text.x = element_text(angle = 45))+
-  ggtitle(paste(insurar.names[ins], "compliments, complaints and conversions"))+
-  xlab("Date") +
-  ylab("Frequency")
-
-ggplot() + 
-  geom_bar(data = ave.time.pm, aes(x = post.date.month, y = as.numeric(response.time), fill = as.numeric(response.time)), stat = "identity")+
-  ggtitle(paste(insurar.names[ins], "response time"))+
-  xlab("Date") +
-  ylab("Average number of days")
 

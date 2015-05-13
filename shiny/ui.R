@@ -27,13 +27,21 @@ shinyUI(fluidPage(
                            format = "yyyy-mm-dd",
                            startview = "month"
                            ),
+                 
                  wellPanel(plotOutput("Nature"),
+                           fluidRow(
                            dateInput("daterangeN",
                                      label = "Select Month",
-                                     value = "2014-05-02",
+                                     value = seq(Sys.Date(), length = 2, by = "-1 month")[2],
                                      min = "2014-05-02",
                                      format = "yyyy-mm-dd",
-                                     startview = "month"
+                                     startview = "month"),
+                           selectInput("Nature",
+                                       "Nature: ",
+                                       choices = c("Complaint",
+                                                   "Compliment"),
+                                       selected  = "Complaint"
+                                       )
 
                              ))
                  

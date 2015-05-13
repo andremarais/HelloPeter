@@ -1,4 +1,4 @@
-nature <- function(insurar, plot.month) {
+nature <- function(insurar, plot.month, nature) {
   
   if (insurar == "Mom") {
     hp.df <- Mom; p.name <- "Momentum"
@@ -28,7 +28,7 @@ nature <- function(insurar, plot.month) {
   hp.df$response.time <- hp.df$response.date - hp.df$post.date
   hp.df$post.date.month <- as.Date(paste(substring(as.character(hp.df$post.date), 1, 7), "01", sep = "-" ))
   
-  
+  hp.df <- hp.df[which(hp.df$type == nature),]
 
   
   
@@ -45,12 +45,13 @@ nature <- function(insurar, plot.month) {
 
   nature.plot <- ggplot()+ 
     geom_bar(data = to.plot, aes(x = reorder(nature, freq), y = freq, fill = freq), stat = "identity", position = "dodge")+ 
-    #theme(axis.text.x = element_text(angle = 45))+ 
     coord_flip() +
-    #ggtitle(paste(p.name, " compliments, complaints and conversions"))+
-    xlab("Nature of post") +
+    xlab("") +
     ylab("Frequency")+
-    ggtitle("Top 5 natures of complaints")
+    ggtitle(paste("Top 5 natures of", nature, sep = " "))+
+    theme(legend.position="none")+
+    scale_fill_gradient(low = "black", high = if(nature == "Complaint") "red" else "blue")
+    
 
   
   return(nature.plot)

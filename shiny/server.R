@@ -68,7 +68,7 @@ output$PostsData <- downloadHandler(
 )
   
 #Nature Plot
-output$Nature <- renderPlot(nature(input$Insurer, input$daterangeN))
+output$Nature <- renderPlot(nature(input$Insurer, input$daterangeN, input$Nature))
 
 
   
