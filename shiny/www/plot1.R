@@ -1,24 +1,24 @@
-complaints <- function(insurar, from) {
+complaints <- function(insurer, from) {
   
-  if (insurar == "Mom") {
+  if (insurer == "Mom") {
     hp.df <- Mom; p.name <- "Momentum"
-  } else if (insurar == "MomHealth") {
+  } else if (insurer == "MomHealth") {
     hp.df <- MomHealth; p.name <- "Momentum Health"
-  } else if (insurar == "MSTI") {
+  } else if (insurer == "MSTI") {
     hp.df <- MSTI; p.name <- "Momentum Short Term"
-  } else if (insurar == "DiscHealth") {
+  } else if (insurer == "DiscHealth") {
     hp.df <- DiscHealth; p.name <- "Discovery Health"
-  } else if (insurar == "DiscLife") {
+  } else if (insurer == "DiscLife") {
     hp.df <- DiscLife; p.name <- "Discovery Life"
-  } else if (insurar == "DiscInsure") {
+  } else if (insurer == "DiscInsure") {
     hp.df <- DiscInsure; p.name <- "Discovery Insure"
-  } else if (insurar == "Liberty") {
+  } else if (insurer == "Liberty") {
     hp.df <- Liberty; p.name <- "Liberty"
-  } else if (insurar == "Metropolitan") {
+  } else if (insurer == "Metropolitan") {
     hp.df <- Metropolitan; p.name <- "Metropolitan"
-  } else if (insurar == "Outsurance") {
+  } else if (insurer == "Outsurance") {
     hp.df <- OutSurance; p.name <- "Outsurance"
-  } else if (insurar == "MiWay") {
+  } else if (insurer == "MiWay") {
     hp.df <- MiWay; p.name <- "MiWay"
   }
   

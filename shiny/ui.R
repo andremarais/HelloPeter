@@ -3,6 +3,7 @@
 # require(wordcloud)
 require(plyr)
 require(ggplot2)
+require(scales)
 
 shinyUI(fluidPage(
   titlePanel("Hello Peter stats"),
