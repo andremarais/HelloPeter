@@ -3,12 +3,15 @@ require(XML)
 require(wordcloud)
 require(plyr)
 require(ggplot2)
+require(stringr)
 
 trim.leading <- function (x)  sub("^\\s+", "", x)
 trim.trailing <- function (x) sub("\\s+$", "", x)
 cleanFun <- function(htmlString) {
   return(gsub("<.*?>", "", htmlString))
 }
+stripwhitespace <- function(x) gsub("^\\s+|\\s+$", "", x)
+
 
 
 hp <- c()
@@ -50,7 +53,7 @@ Miway <- "http://hellopeter.com/miway/compliments-and-complaints?country=South%2
 
 
 
-insurars <- c(MomHealth, Momentum, MSTI,
+insurers <- data.frame(MomHealth, Momentum, MSTI,
               DiscHealth, DiscLife, DiscInsure,
               OM,
               LibertyLife,
@@ -69,11 +72,11 @@ insurar.names <- c("Momentum Health", "Momentum", "Momentum Short Term",
 
 ## BEGIN HIERSO POES!!!
 system.time(
-  #for (h in 1:length(insurars)) {
-  for (h in 1:1) {
+  #for (h in 1:length(insurers)) {
+  for (h in 1:3) {
     
     
-    hp[1] <- httpGET(paste(insurars[h], 1, sep = ""))
+    hp[1] <- httpGET(paste(insurers[1,h], 1, sep = ""))
     
     
     
@@ -87,7 +90,7 @@ system.time(
     
     
     for (i in 1:pages){
-      hp[i] <- httpGET(paste(insurars[h], i, sep = ""))
+      hp[i] <- httpGET(paste(insurers[1,h], i, sep = ""))
       print(i)
       
     }
@@ -175,8 +178,8 @@ system.time(
     nature.vector <- as.vector(as.matrix(nature))
     post.vector <- as.vector(as.matrix(post))
     
-    hp.df <- data.frame(cbind(time.vector, type.vector, response.date.vector, nature.vector, post.vector))
-    colnames(hp.df) <- c("post.date", "type", "response.date", "nature", "content")
+    head <- data.frame(cbind(insurers[h], insurar.names[h], time.vector, type.vector, response.date.vector, nature.vector, post.vector))
+    colnames(hp.df) <- c("Insurer", "Insurer.proper.name " "post.date", "type", "response.date", "nature", "content")
     hp.df <- hp.df[!is.na(hp.df$post.date),]
     
     all.data[[h]] <- hp.df
@@ -184,6 +187,7 @@ system.time(
     
   }
 )
+
 
 
 

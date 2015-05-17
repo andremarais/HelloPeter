@@ -1,50 +1,32 @@
-setwd("C:/Users/anmarais/Desktop/GitHub/HelloPeter/shiny")
-
-Mom <- readRDS(file.path(getwd(),"data/Momentum.RDS"))
-MomHealth <- readRDS(file.path(getwd(),"data/Momentum Health.RDS")) 
-MSTI <- readRDS(file.path(getwd(),"data/Momentum Short Term.RDS")) 
-DiscHealth <- readRDS(file.path(getwd(),"data/Discovery Health.RDS")) 
-DiscLife <- readRDS(file.path(getwd(),"data/Discovery Life.RDS")) 
-DiscInsure <- readRDS(file.path(getwd(),"data/Discovery Insure.RDS")) 
-Liberty <- readRDS(file.path(getwd(),"data/Liberty.RDS")) 
-Metropolitan <- readRDS(file.path(getwd(),"data/Metropolitan.RDS")) 
-OutSurance <- readRDS(file.path(getwd(),"data/OutSurance.RDS")) 
-MiWay <- readRDS(file.path(getwd(),"data/MiWay.RDS")) 
-
-Mom$name <- "Mom"
-MomHealth$name <- "MomHealth"
-MSTI$name <- "MSTI"
-DiscHealth$name <- "DiscHealth"
-DiscLife$name <- "DiscLife" 
-DiscInsure$name <- "DiscInsure" 
-Liberty$name <- "Liberty" 
-Metropolitan$name <- "Metropolitan"  
-OutSurance$name <- "OutSurance"
-MiWay$name <- "MiWay" 
-
-Mom$Pname <- "Momentum"
-MomHealth$Pname <- "Momentum Health"
-MSTI$Pname <- "MSTI"
-DiscHealth$Pname <- "Discovery Health"
-DiscLife$Pname <- "Discovery Life" 
-DiscInsure$Pname <- "Discovery Insure" 
-Liberty$Pname <- "Liberty" 
-Metropolitan$Pname <- "Metropolitan"  
-OutSurance$Pname <- "OutSurance"
-MiWay$Pname <- "MiWay" 
+summarytable <- function(hp.df, insurers, month) {
 
 
 
-hp <- rbind(Mom, MomHealth, MSTI, DiscHealth, DiscLife, DiscInsure, Liberty, Metropolitan, OutSurance, MiWay)
-hp$response.time <- as.Date(hp$response.date) - as.Date(hp$post.date)
-
-hp1 <- hp[hp$post.month == "2015-04",]
-hp1$response.time
 
 
-aggregate(data = hp1, response.time ~ name , FUN = mean)
+
+hp1 <- hp.df[which(substring(hp.df$post.date.month, 1, 7) == substring(as.character(month), 1,7) &
+                       HP.data$response.date > 0),]
+
+hp1 <- hp1[which(hp1$Insurer %in% insurers),]
+
+response.time <- aggregate(data = hp1, response.delay ~ Insurer.proper.name , FUN = mean)
 
 
-a <- as.data.frame.matrix(table(hp1[,c('name', 'type')]))
-a$Compliment.Ratio <- percent(a$Compliment/ (a$Complaint + a$Compliment))
+summary <- as.data.frame.matrix(table(hp1[,c('Insurer.proper.name', 'type')]))
+summary$Compliment.Ratio <- percent(summary$Compliment/ (summary$Complaint + summary$Compliment))
+summary$Conversion.Ratio <- percent(summary$Conversion/ summary$Complaint)
+summary$Pname <- rownames(summary)
+
+summary.table <- merge(summary, response.time, by.x = 'Pname', by.y = 'Insurer.proper.name')
+
+colnames(summary.table) <- c("Insurer", "Complaints", "Compliments", "Conversions", "Compliment ratio", "Conversion ratio", "Response time (hours)")
+rownames(summary.table) <- NULL
+
+
+return(summary.table[order((summary.table$Complaints + summary.table$Compliments), decreasing = T),])
+
+}
+
+
 

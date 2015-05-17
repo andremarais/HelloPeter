@@ -1,0 +1,16 @@
+{
+    "contents" : "Mom$name <- \"Mom\"\nMomHealth$name <- \"MomHealth\"\nMSTI$name <- \"MSTI\"\nDiscHealth$name <- \"DiscHealth\"\nDiscLife$name <- \"DiscLife\" \nDiscInsure$name <- \"DiscInsure\" \nLiberty$name <- \"Liberty\" \nMetropolitan$name <- \"Metropolitan\"  \nOutSurance$name <- \"OutSurance\"\nMiWay$name <- \"MiWay\" \n\nMom$Pname <- \"Momentum\"\nMomHealth$Pname <- \"Momentum Health\"\nMSTI$Pname <- \"MSTI\"\nDiscHealth$Pname <- \"Discovery Health\"\nDiscLife$Pname <- \"Discovery Life\" \nDiscInsure$Pname <- \"Discovery Insure\" \nLiberty$Pname <- \"Liberty\" \nMetropolitan$Pname <- \"Metropolitan\"  \nOutSurance$Pname <- \"OutSurance\"\nMiWay$Pname <- \"MiWay\" \n\n\n\nhp <- rbind(Mom, MomHealth, MSTI, DiscHealth, DiscLife, DiscInsure, Liberty, Metropolitan, OutSurance, MiWay)\nhp$response.time <-difftime(hp$post.date, hp$response.date, units = \"hours\")\n\nhp1 <- hp[substring(hp$post.date, 1, 7) == \"2015-04\",]\n\n\n\nresponse.time <- aggregate(data = hp1, response.time ~ Pname , FUN = mean)\n\n\nsummary <- as.data.frame.matrix(table(hp1[,c('Pname', 'type')]))\nsummary$Compliment.Ratio <- percent(summary$Compliment/ (summary$Complaint + summary$Compliment))\nsummary$Conversion.Ratio <- percent(summary$Conversion/ summary$Complaint)\nsummary$Pname <- rownames(summary)\n\nsummary.table <- merge(summary, response.time, by.x = 'Pname', by.y = 'Pname')\n\ncolnames(summary.table) <- c(\"Insurer\", \"Complaints\", \"Compliments\", \"Conversions\", \"Conversion ratio\", \"Compliment ratio\", \"Response time (days)\")\n\nsummary.table[order((summary.table$Complaint + summary.table$Compliment), decreasing = T),]\n\n",
+    "created" : 1431693265181.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2619278041",
+    "id" : "9EB79577",
+    "lastKnownWriteTime" : 1431693353,
+    "path" : "~/GitHub/HelloPeter/shiny/www/summarytable.R",
+    "project_path" : "www/summarytable.R",
+    "properties" : {
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}
