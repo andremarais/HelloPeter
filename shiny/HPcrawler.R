@@ -73,7 +73,7 @@ insurar.names <- c("Momentum Health", "Momentum", "Momentum Short Term",
 ## BEGIN HIERSO POES!!!
 system.time(
   #for (h in 1:length(insurers)) {
-  for (h in 1:3) {
+  for (h in 11) {
     
     
     hp[1] <- httpGET(paste(insurers[1,h], 1, sep = ""))
@@ -178,8 +178,8 @@ system.time(
     nature.vector <- as.vector(as.matrix(nature))
     post.vector <- as.vector(as.matrix(post))
     
-    head <- data.frame(cbind(insurers[h], insurar.names[h], time.vector, type.vector, response.date.vector, nature.vector, post.vector))
-    colnames(hp.df) <- c("Insurer", "Insurer.proper.name " "post.date", "type", "response.date", "nature", "content")
+    hp.df <- data.frame(cbind(insurers[h], insurar.names[h], time.vector, type.vector, response.date.vector, nature.vector, post.vector))
+    colnames(hp.df) <- c("Insurer", "Insurer.proper.name ", "post.date", "type", "response.date", "nature", "content")
     hp.df <- hp.df[!is.na(hp.df$post.date),]
     
     all.data[[h]] <- hp.df

@@ -11,8 +11,9 @@ complaints <- function(hp.df, insurer) {
   
   not.zero <- which(hp.df$response.date != 0)
   
+  hp.df <- hp.df[not.zero,]
   
-  hp.df$post.date.month <- as.Date(paste(substring(as.character(hp.df$post.date), 1, 7), "01", sep = "-" ))
+  #hp.df$post.date.month <- as.Date(paste(substring(as.character(hp.df$post.date), 1, 7), "01", sep = "-" ))
   
   
   
